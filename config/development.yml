@@ -1,0 +1,13 @@
+LOG_LEVEL: INFO
+HOST: 127.0.0.1
+PORT: 8000
+ORIGINS: ['http://localhost:8000', 'http://127.0.0.1:8000']
+
+DATABASE:
+  DRIVER: mysql+pymysql
+  NAME: Travel
+  HOST: 127.0.0.1
+  PORT: 3306
+  USERNAME: root
+  QUERY:
+    charset: utf8mb4
