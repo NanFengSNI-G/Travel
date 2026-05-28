@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:9.6.0
+    container_name: travel-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MySQL_PASSWORD:-123456}
+      MYSQL_DATABASE: Travel
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - travel-net
+
+  app:
+    build: .
+    container_name: travel-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      EMP_CONF_HOST: 0.0.0.0
+      EMP_CONF_DATABASE__HOST: mysql
+      EMP_CONF_DATABASE__PORT: 3306
+      MySQL_PASSWORD: ${MySQL_PASSWORD:-123456}
+      API_KEY: ${API_KEY:-sk-placeholder}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - travel-net
+
+volumes:
+  mysql_data:
+
+networks:
+  travel-net:
+    driver: bridge
